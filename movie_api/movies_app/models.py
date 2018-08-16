@@ -4,7 +4,27 @@ from django.db import models
 class Movie(models.Model):
     title = models.CharField(max_length=200)
     year = models.DateField(auto_now=False, auto_now_add=False)
-    description = models.TextField()
+    rate = models.CharField(max_length=10, default='')
+    release = models.DateField(auto_now=False, auto_now_add=False, default='2000-01-01')
+    runtime = models.IntegerField(default=0)
+    genre = models.TextField(default='')
+    director = models.CharField(max_length=200, default='')
+    writer = models.TextField(default='')
+    plot = models.TextField(default='')
+    language = models.CharField(max_length=50, default='')
+    country = models.CharField(max_length=100, default='')
+    awards = models.TextField(default='')
+    poster = models.TextField(default='')
+    ratings = models.TextField(default='')
+    metascore = models.IntegerField(default=0)
+    imdbrating = models.FloatField(default=0)
+    imdbid = models.TextField(default='')
+    type = models.TextField(default='')
+    dvd = models.DateField(default='2000-01-01')
+    boxoffice = models.TextField(default='')
+    production = models.TextField(default='')
+    website = models.TextField(default='')
+    response = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

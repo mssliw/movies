@@ -5,7 +5,7 @@ from .models import Movie, Comment
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ('id', 'title', 'year', 'description')
+        fields = ('id', 'title', 'year', 'plot')
 
 
 class CommentSerializer(serializers.ModelSerializer):
