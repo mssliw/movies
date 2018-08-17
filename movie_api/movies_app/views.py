@@ -34,7 +34,7 @@ class MovieDetails(APIView):
     '''
     def get_object(self, pk):
         try:
-            return Movie.objects.get(pk=pk)
+            return Movie.objects.get(title=pk)
         except Movie.DoesNotExist:
             raise Http404
 
