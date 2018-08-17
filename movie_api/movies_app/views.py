@@ -1,15 +1,9 @@
 import requests
 
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.views.generic import TemplateView
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
-from rest_framework import viewsets
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
+
 from .forms import SubmitMovieForm
 from .models import Movie, Comment
 from .serializers import MovieSerializer, CommentSerializer
@@ -59,33 +53,3 @@ class MovieDetails(APIView):
         movie = self.get_object(pk)
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# class MovieView(viewsets.ModelViewSet):
-#     queryset = Movie.objects.all()
-#     serializer_class = MovieSerializer
-#
-#
-# class RequestView(TemplateView):
-#     # template_name = 'movies.html'
-#     queryset = Movie.objects.all()
-#     serializer_class = MovieSerializer
-#
-#     @action(methods=['post'], detail=True)
-#     def save_movie(self, request):
-#         form = SubmitMovieForm(request.POST)
-#         if form.is_valid():
-#             url = form.cleaned_data['url']
-#             print(url)
-#             r = request.get('http://www.omdbapi.com/?apikey=' + settings.OMDB_KEY + '&t=' + url)
-#             json = r.json()
-#             print(json)
-#             serializer = MovieSerializer(data=json)
-#             if serializer.is_valid():
-#                 movie = serializer.save()
-#                 return HttpResponseRedirect('')
-#             else:
-#                 form = SubmitMovieForm()
-#         return render(request, 'movies.html', {'form': SubmitMovieForm()}, movies=queryset)
-
-
