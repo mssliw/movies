@@ -1,5 +1,7 @@
 import requests
 
+from django.http import Http404
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -32,9 +34,9 @@ class MovieDetails(APIView):
     '''
     def get_object(self, pk):
         try:
-            movie = Movie.objects.get(pk=pk)
+            return Movie.objects.get(pk=pk)
         except Movie.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404
 
     def get(self, request, pk, format=None):
         movie = self.get_object(pk)
