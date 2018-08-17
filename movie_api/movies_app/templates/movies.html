@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <ul>
+        <li> elo elo elo elo </li>
+    </ul>
+    <img src="{{ embed.thumbnail_url }}" />
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.submit }}
+        <input type="text"/>
+        <input type="submit" value="Save"/>
+    </form>
+
+{% endblock %}

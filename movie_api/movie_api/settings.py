@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'movies_app',
 ]
 
+OMDB_KEY = 'c64592fe'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
