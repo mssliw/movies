@@ -3,6 +3,7 @@ from django.conf.urls import url
 from . import views
 # from .views import RequestView
 from rest_framework import routers
+from rest_framework.urlpatterns import format_suffix_patterns
 
 router = routers.DefaultRouter()
 # router.register('movies_app', views.MovieView)
@@ -14,3 +15,5 @@ urlpatterns = [
     # path('', include(router.urls)),
     # path('movies/', RequestView.as_view())
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
