@@ -105,7 +105,8 @@ class RequestApi(FormView):     #TODO: Save response to the db
                     print(rating_data, ' rating', type(rating))
                     rating_serializer = RatingSerializer(data=rating_data)
                     if rating_serializer.is_valid():
-                        rating_serializer.save()
+                        print(rating_serializer)
+                        # rating_serializer.save()
                     else:
                         print('sth wrong')
                 return JsonResponse(serializer.data)

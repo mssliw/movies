@@ -3,7 +3,7 @@ from django.db import models
 
 class Movie(models.Model):
     title = models.CharField(max_length=200)
-    year = models.IntegerField(default=0)
+    year = models.CharField(max_length=20)
     rate = models.CharField(max_length=10, default='')
     release = models.DateField(
         auto_now=False,
@@ -33,8 +33,6 @@ class Movie(models.Model):
         return self.title
 
 
-
-
 class Rating(models.Model):
     source = models.CharField(max_length=200)
     value = models.CharField(max_length=10)
@@ -46,17 +44,6 @@ class Rating(models.Model):
 
     def __str__(self):
         return self.source
-
-    def save(self, *a, **kw):
-        for field in self._meta.fields:
-            if isinstance(field, Rating):
-                id_attname = field.attname
-                instance_attname = id_attname.rpartition("_id")[0]
-                instance = getattr(self, instance_attname)
-                instance_id = instance.pk
-                setattr(self, id_attname, instance_id)
-
-        return Rating.save(self, *a, **kw)
 
 
 class Comment(models.Model):
