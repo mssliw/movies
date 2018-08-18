@@ -1,6 +1,8 @@
 import requests
 
-from django.http import Http404
+from django.shortcuts import render
+from django.http import Http404, JsonResponse
+from django.views.generic.edit import FormView
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -12,9 +14,9 @@ from .serializers import MovieSerializer, CommentSerializer
 
 
 class MoviesList(APIView):
-    '''
+    """
     List all of the movies or create a new movie record
-    '''
+    """
     def get(self, request, format=None):
         movies = Movie.objects.all()
         serializer = MovieSerializer(movies, many=True)
@@ -29,13 +31,15 @@ class MoviesList(APIView):
 
 
 class MovieDetails(APIView):
-    '''
+    """
     Retrieve, update or delete a movie
-    '''
+    """
     def get_object(self, pk):
         try:
             return Movie.objects.get(title=pk)
-        except Movie.DoesNotExist:
+        except Movie.MultipleObjectsReturned:   #TODO: HANDLE NON-UNIQUE TITLES IF NEEDED
+            raise Http404
+        except Movie.DoesNotExist:  #TODO: get from external API
             raise Http404
 
     def get(self, request, pk, format=None):
@@ -55,3 +59,22 @@ class MovieDetails(APIView):
         movie = self.get_object(pk)
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RequestApi(FormView):     #TODO: Save response to the db
+    """
+    Wip external-API handler
+
+    """
+    template_name = 'movies.html'
+    form_class = SubmitMovieForm
+    success_url = 'tldr/'
+    search_result = {}
+
+    def form_valid(self, form):
+        print(form.fields['title'])
+
+        search_result = form.search()
+        print(search_result, ' VIEW TITLE')
+        # return super().form_valid(form)
+        return JsonResponse(search_result)

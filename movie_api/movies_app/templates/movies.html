@@ -1,17 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
+  <h2>search for movie</h2>
 
-    <ul>
-        <li> elo elo elo elo </li>
-    </ul>
-    <img src="{{ embed.thumbnail_url }}" />
+  <form method="post">
+      {% csrf_token %}
+    {{ form.as_table }}
+    <button type="submit" action="{{ form.search }}">search</button>
+  </form>
 
-    <form action="" method="POST">
-        {% csrf_token %}
-        {{ form.submit }}
-        <input type="text"/>
-        <input type="submit" value="Save"/>
-    </form>
+  {% if search_result %}
+    <hr>
+    {% if search_result.success %}
+      {% for result in search_result.results %}
+        <h3>{{ result.title }}</h3>
+
+      {% endfor %}
+    {% else %}
+      <p><em>{{ search_result.message }}</em></p>
+    {% endif %}
+  {% endif %}
 
 {% endblock %}
