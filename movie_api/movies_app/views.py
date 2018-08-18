@@ -11,7 +11,11 @@ from rest_framework.views import APIView
 
 from .forms import SubmitMovieForm
 from .models import Movie, Comment
-from .serializers import MovieSerializer, CommentSerializer
+from .serializers import (
+    MovieSerializer,
+    RatingSerializer,
+    CommentSerializer
+)
 
 
 class MoviesList(APIView):
@@ -85,9 +89,25 @@ class RequestApi(FormView):     #TODO: Save response to the db
             data = dict((key.lower(), value) for key, value in search_result.items())
             serializer = MovieSerializer(data=data)
             response_status = search_result['Response']
+
             if response_status and serializer.is_valid():
                 print('response is ', response_status, 'serializer is valid')
-                serializer.save()
+                movie = serializer.save()
+                id = movie.id
+                print(id)
+                ratings = search_result['Ratings']
+
+                print(ratings, type(ratings))
+
+                for rating in ratings:
+                    rating_data = dict((key.lower(), value) for key, value in rating.items())
+                    rating_data['movie'] = movie
+                    print(rating_data, ' rating', type(rating))
+                    rating_serializer = RatingSerializer(data=rating_data)
+                    if rating_serializer.is_valid():
+                        rating_serializer.save()
+                    else:
+                        print('sth wrong')
                 return JsonResponse(serializer.data)
             else:
                 print('serializer not valid or status wrong')

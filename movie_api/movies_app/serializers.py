@@ -1,11 +1,23 @@
 from rest_framework import serializers
-from .models import Movie, Comment
+from .models import Movie, Rating, Comment
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = (
+            'source',
+            'value',
+        )
 
 
 class MovieSerializer(serializers.ModelSerializer):
+    ratings = RatingSerializer(many=True, read_only=True)
+
     class Meta:
         model = Movie
         fields = (
+            'id',
             'title',
             'year',
             'rate',
@@ -19,13 +31,13 @@ class MovieSerializer(serializers.ModelSerializer):
             'country',
             'awards',
             'poster',
-            'metascore',
             'imdbrating',
             'imdbid',
             'type',
             'boxoffice',
             'production',
             'website',
+            'ratings'
         )
 
 
