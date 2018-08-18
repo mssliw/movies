@@ -2,6 +2,7 @@ import requests
 
 from django.shortcuts import render
 from django.http import Http404, JsonResponse
+from django.views.generic import DetailView, View
 from django.views.generic.edit import FormView
 
 from rest_framework import status
@@ -72,9 +73,25 @@ class RequestApi(FormView):     #TODO: Save response to the db
     search_result = {}
 
     def form_valid(self, form):
-        print(form.fields['title'])
-
-        search_result = form.search()
-        print(search_result, ' VIEW TITLE')
+        title = form['title'].data
+        print(form['title'].data)
+        if Movie.objects.filter(title__iexact=title).exists():
+            movie = Movie.objects.filter(title__iexact=title).first()
+            serializer = MovieSerializer(movie)
+            print('already exist')
+            return JsonResponse(serializer.data)
+        else:
+            search_result = form.search()
+            data = dict((key.lower(), value) for key, value in search_result.items())
+            serializer = MovieSerializer(data=data)
+            response_status = search_result['Response']
+            if response_status and serializer.is_valid():
+                print('response is ', response_status, 'serializer is valid')
+                serializer.save()
+                return JsonResponse(serializer.data)
+            else:
+                print('serializer not valid or status wrong')
+                print(response_status, serializer.is_valid())
+                print(serializer.errors)
         # return super().form_valid(form)
-        return JsonResponse(search_result)
+            return JsonResponse(search_result)

@@ -3,9 +3,9 @@
 {% block content %}
   <h2>search for movie</h2>
 
-  <form method="post">
+  <form method="post" label="title">
       {% csrf_token %}
-    {{ form.as_table }}
+      {{ form.as_table }}
     <button type="submit" action="{{ form.search }}">search</button>
   </form>
 
