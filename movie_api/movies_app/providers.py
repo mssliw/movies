@@ -8,4 +8,3 @@ class GenericProvider(object):
 
     def retrieve(self):
         return self.provider(self.movie).retrieve()
-

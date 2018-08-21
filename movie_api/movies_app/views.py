@@ -6,11 +6,12 @@ from django.views.generic import DetailView, View
 from django.views.generic.edit import FormView
 
 from rest_framework import status
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import SubmitMovieForm
-from .models import Movie, Comment
+from .models import Movie, Comment, Rating
 from .serializers import (
     MovieSerializer,
     RatingSerializer,
@@ -71,48 +72,66 @@ class RequestApi(FormView):     #TODO: Save response to the db
     Wip external-API handler
 
     """
+    renderer_classes = TemplateHTMLRenderer
     template_name = 'movies.html'
     form_class = SubmitMovieForm
     success_url = 'tldr/'
     search_result = {}
 
+    # def get_queryset(self):
+    #     queryset = Movie.objects.all()
+    #     # Set up eager loading to avoid N+1 selects
+    #     queryset = self.get_serializer_class().setup_eager_loading(queryset)
+    #     return queryset
+
     def form_valid(self, form):
         title = form['title'].data
-        print(form['title'].data)
+        print('requested title: ', form['title'].data)
         if Movie.objects.filter(title__iexact=title).exists():
             movie = Movie.objects.filter(title__iexact=title).first()
             serializer = MovieSerializer(movie)
-            print('already exist')
+            print(title, ' already exists')
             return JsonResponse(serializer.data)
         else:
             search_result = form.search()
             data = dict((key.lower(), value) for key, value in search_result.items())
             serializer = MovieSerializer(data=data)
-            response_status = search_result['Response']
 
-            if response_status and serializer.is_valid():
-                print('response is ', response_status, 'serializer is valid')
-                movie = serializer.save()
-                id = movie.id
-                print(id)
-                ratings = search_result['Ratings']
+            if search_result['success']:
+                response_status = search_result['Response']
 
-                print(ratings, type(ratings))
+                if response_status and serializer.is_valid():
+                    print('response is ', response_status, ' serializer is valid')
+                    movie = serializer.save()
+                    movie_id = movie.id
+                    print('movie id ', movie_id)
+                    ratings = search_result['Ratings']
+                    print('ratings ', ratings, type(ratings))
 
-                for rating in ratings:
-                    rating_data = dict((key.lower(), value) for key, value in rating.items())
-                    rating_data['movie'] = movie
-                    print(rating_data, ' rating', type(rating))
-                    rating_serializer = RatingSerializer(data=rating_data)
-                    if rating_serializer.is_valid():
-                        print(rating_serializer)
-                        # rating_serializer.save()
-                    else:
-                        print('sth wrong')
-                return JsonResponse(serializer.data)
+                    for rating in ratings:
+                        rating_data = dict((key.lower(), value) for key, value in rating.items())
+                        # rating_data.update({'movie': movie})
+                        print(rating_data, ' rating', type(rating))
+                        rating_serializer = RatingSerializer(data=rating_data)
+                        if rating_serializer.is_valid():
+                            print(rating_serializer)
+                            rating_source = str(rating_serializer['source'].value)
+                            rating_value = str(rating_serializer['value'].value)
+                            print(rating_source, rating_value)
+                            rating = Rating(movie=movie, source=rating_source, value=rating_value)
+                            print(rating)
+                            rating.save()
+                        else:
+                            print(rating_serializer.errors)
+
+                            print('sth wrong')
+                    return JsonResponse(serializer.data)
+                    print(movie.ratings)
+                else:
+                    print('serializer not valid or status wrong')
+                    print(response_status, serializer.is_valid())
+                    print(serializer.errors)
             else:
-                print('serializer not valid or status wrong')
-                print(response_status, serializer.is_valid())
-                print(serializer.errors)
+                pass
         # return super().form_valid(form)
             return JsonResponse(search_result)

@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>search for movie</h2>
-
-  <form method="post" label="title">
+<div class ="containter">
+  <form method="post">
       {% csrf_token %}
       {{ form.as_table }}
     <button type="submit" action="{{ form.search }}">search</button>
@@ -20,5 +19,5 @@
       <p><em>{{ search_result.message }}</em></p>
     {% endif %}
   {% endif %}
-
+</div>
 {% endblock %}

@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Movie(models.Model):
+    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
     year = models.CharField(max_length=20)
     rate = models.CharField(max_length=10, default='')
@@ -34,12 +35,13 @@ class Movie(models.Model):
 
 
 class Rating(models.Model):
+    id = models.AutoField(primary_key=True)
     source = models.CharField(max_length=200)
     value = models.CharField(max_length=10)
     movie = models.ForeignKey(
         Movie,
-        related_name='ratings',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ratings'
     )
 
     def __str__(self):
