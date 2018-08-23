@@ -14,7 +14,8 @@ class SubmitMovieForm(forms.Form):
         if title is not None:
             search_result = {}
             api_key = settings.OMDB_KEY
-            url = 'http://www.omdbapi.com/?apikey={}&t={}'.format(api_key, title)
+            url = 'http://www.omdbapi.com/?apikey={}&t={}'\
+                .format(api_key, title)
             response = requests.get(url)
             if response.status_code == 200:
                 search_result = response.json()
