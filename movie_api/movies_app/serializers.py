@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import Movie, Rating, Comment
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
@@ -13,6 +19,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     ratings = RatingSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Movie
@@ -37,11 +44,6 @@ class MovieSerializer(serializers.ModelSerializer):
             'boxoffice',
             'production',
             'website',
-            'ratings'
+            'ratings',
+            'comments'
         )
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = 'comment'

@@ -16,7 +16,7 @@ from .serializers import (
 )
 
 
-class MoviesList(APIView):
+class MoviesListView(APIView):
     """
     List of movies existing in database
     """
@@ -91,7 +91,7 @@ class MoviesList(APIView):
             return Response(serializer.errors)
 
 
-class MovieDetails(APIView):
+class MovieDetailsView(APIView):
     """
     Title-based movie details
     """
@@ -107,3 +107,28 @@ class MovieDetails(APIView):
         movie = self.get_object(pk)
         serializer = MovieSerializer(movie)
         return Response(serializer.data)
+
+
+class CommentView(APIView):
+    """
+    List of comments
+    """
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get(self, pk, format=None):
+        comments = Comment.objects.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        comment_serializer = CommentSerializer(data=request.data)
+        if comment_serializer.is_valid():
+            comment_body = str(
+                comment_serializer['comment'].value)
+            movie = int(
+                comment_serializer['movie'].value)
+            commented_movie = Movie.objects.get(id=movie)
+            comment = Comment(comment=comment_body, movie=commented_movie)
+            comment.save()
+            return Response(comment_serializer.data)
