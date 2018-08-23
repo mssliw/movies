@@ -3,6 +3,7 @@ import requests
 from django.conf import settings
 from django.http import Http404
 
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -22,6 +23,8 @@ class MoviesListView(APIView):
     """
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+    # filter_backends = (DjangoFilterBackend)
+    # filter_fields = ('title', 'id')
 
     def get(self, request, format=None):
         movies = Movie.objects.all()
@@ -132,3 +135,20 @@ class CommentView(APIView):
             comment = Comment(comment=comment_body, movie=commented_movie)
             comment.save()
             return Response(comment_serializer.data)
+
+
+class MovieCommentsView(APIView):
+    """
+    Title-based movie details
+    """
+
+    def get_object(self, pk):
+        try:
+            return Movie.objects.get(id=pk)
+        except Movie.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        movie = self.get_object(pk)
+        serializer = MovieSerializer(movie)
+        return Response(serializer.data['comments'])
