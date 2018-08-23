@@ -30,8 +30,6 @@ class MoviesList(APIView):
 
     def post(self, request, format=None):
 
-        title = request.data.get('title')
-
         def search(title):
             result = {}
             api_key = settings.OMDB_KEY
@@ -49,42 +47,48 @@ class MoviesList(APIView):
                     print('error occured', response.status_code)
             return result
 
-        search_result = search(title)
-        print(search_result)
-        data = dict((key.lower(), value)
-                    for key, value in search_result.items())
-        serializer = MovieSerializer(data=data)
+        serializer = MovieSerializer(data=request.data)
+        title = request.data.get('title')
 
-        if search_result['success']:
-            response_status = search_result['Response']
+        if serializer.is_valid():
+            search_result = search(title)
+            fetched_data = dict((key.lower(), value)
+                                for key, value in search_result.items())
+            serializer = MovieSerializer(data=fetched_data)
 
-            if response_status and serializer.is_valid():
-                movie = serializer.save()
-                ratings = search_result['Ratings']
+            if search_result['success']:
+                response_status = search_result['Response']
 
-                for rating in ratings:
-                    rating_data = dict((key.lower(), value)
-                                       for key, value in rating.items())
-                    rating_serializer = RatingSerializer(data=rating_data)
-                    if rating_serializer.is_valid():
-                        rating_source = str(rating_serializer['source'].value)
-                        rating_value = str(rating_serializer['value'].value)
-                        rating = Rating(movie=movie,
-                                        source=rating_source,
-                                        value=rating_value)
-                        rating.save()
-                    else:
-                        print(rating_serializer.errors)
-                        print('sth wrong')
-                return Response(serializer.data)
+                if response_status and serializer.is_valid():
+                    movie = serializer.save()
+                    ratings = search_result['Ratings']
+
+                    for rating in ratings:
+                        rating_data = dict((key.lower(), value)
+                                           for key, value in rating.items())
+                        rating_serializer = RatingSerializer(data=rating_data)
+                        if rating_serializer.is_valid():
+                            rating_source = str(
+                                rating_serializer['source'].value)
+                            rating_value = str(
+                                rating_serializer['value'].value)
+                            rating = Rating(movie=movie,
+                                            source=rating_source,
+                                            value=rating_value)
+                            rating.save()
+                        else:
+                            print(rating_serializer.errors)
+                    return Response(serializer.data)
+                else:
+                    print(response_status,
+                          serializer.is_valid(),
+                          serializer.errors)
             else:
-                print('serializer not valid or status wrong')
-                print(response_status, serializer.is_valid())
-                print(serializer.errors)
-        else:
-            print('search result is wrong')
+                print('search result is wrong')
 
-        return Response(title, status=status.HTTP_201_CREATED)
+            return Response(title, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors)
 
 
 class MovieDetails(APIView):
