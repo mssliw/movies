@@ -3,8 +3,6 @@ import requests
 from django.conf import settings
 from django.http import Http404
 
-from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,14 +15,26 @@ from .serializers import (
 )
 
 
+class RootView(APIView):
+    """
+    Root view of api
+    /movies to get movies list
+    /comments to get comments list
+    """
+    def get(self, request):
+        return Response()
+
+
 class MoviesListView(APIView):
     """
-    List of movies existing in database
+    get:
+    List movies existing in database
+
+    post:
+    Add movie to database based on posted title
     """
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    # filter_backends = (DjangoFilterBackend)
-    # filter_fields = ('title', 'id')
 
     def get(self, request, format=None):
         movies = Movie.objects.all()
@@ -96,7 +106,8 @@ class MoviesListView(APIView):
 
 class MovieDetailsView(APIView):
     """
-    Title-based movie details
+    get/title:
+    List movie details based on title
     """
 
     def get_object(self, pk):
@@ -114,7 +125,11 @@ class MovieDetailsView(APIView):
 
 class CommentView(APIView):
     """
-    List of comments
+    get:
+    List comments
+
+    post:
+    Post a comment for chosen movie
     """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -132,14 +147,18 @@ class CommentView(APIView):
             movie = int(
                 comment_serializer['movie'].value)
             commented_movie = Movie.objects.get(id=movie)
-            comment = Comment(comment=comment_body, movie=commented_movie)
+            comment = Comment(
+                comment=comment_body,
+                movie=commented_movie
+            )
             comment.save()
             return Response(comment_serializer.data)
 
 
 class MovieCommentsView(APIView):
     """
-    Title-based movie details
+    get:
+    List comments by movie id
     """
 
     def get_object(self, pk):
