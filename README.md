@@ -14,7 +14,7 @@ to run:
     >> psql 
     
     and then creating db:
-    >> CREATE DATABASE movies_app;
+    >> CREATE DATABASE movies;
     
 3) run migrations by following command: 
     >> python manage.py migrate
