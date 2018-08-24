@@ -13,7 +13,8 @@ urlpatterns = [
 
     path(
         'movies/',
-        MoviesListView.as_view()
+        MoviesListView.as_view(),
+        name='movie-list-view'
     ),
     re_path(
         r'^movies/(?P<pk>[A-Za-z0-9]+)/$',
@@ -21,7 +22,8 @@ urlpatterns = [
     ),
     path(
         'comments/',
-        CommentView.as_view()
+        CommentView.as_view(),
+        name='comment-list-view'
     ),
     re_path(
         r'^comments/(?P<pk>[0-9]+)/$',

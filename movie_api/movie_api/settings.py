@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'movies_app',
-    'tastypie',
 ]
 
 OMDB_KEY = 'c64592fe'
